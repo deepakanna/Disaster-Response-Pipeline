@@ -1,16 +1,60 @@
 import sys
-
+import pandas as pd
+import numpy as np
+from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
-    pass
+    # load messages dataset
+    messages = pd.read_csv('messages.csv')
+    #messages.head()
+    # load categories dataset
+    categories = pd.read_csv('categories.csv')
+    #categories.head()
+    # merge datasets
+    df = messages.merge(categories, how='inner', on=['id'])
+    #df.head()
+    # create a dataframe of the 36 individual category columns
+    categories = pd.DataFrame(df['categories'].str.split(';', expand=True).values)
+    categories.head()
+    row = categories.iloc[1]
+    rw = [r[:-2] for r in row]
+
+    # rename the columns of `categories`
+    categories.columns = rw
+    #categories.head()
+    # set each value to be the last character of the string
+    # convert column from string to numeric
+    for column in categories:
+        categories[column].astype(str)
+        categories[column] = categories[column].str.split('-', expand=True)[1]
+    categories = categories.astype(int)
+    #categories.dtypes
+    # drop the original categories column from `df`
+
+    df.drop('categories', axis=1, inplace=True)
+
+    # concatenate the original dataframe with the new `categories` dataframe
+    df = pd.concat([df, categories], axis=1)
+    return df
+
+
 
 
 def clean_data(df):
-    pass
+    # check number of duplicates
+    df[df.duplicated()]
+    # drop duplicates
+    df = df.drop_duplicates()
+    # check number of duplicates
+    df[df.duplicated()]
+
 
 
 def save_data(df, database_filename):
-    pass  
+    engine = create_engine('sqlite:///disaster.db')
+    df.to_sql('disaster', engine, index=False)
+
+
 
 
 def main():
@@ -26,7 +70,7 @@ def main():
         df = clean_data(df)
         
         print('Saving data...\n    DATABASE: {}'.format(database_filepath))
-        save_data(df, disaster.db)
+        save_data(df, database_filepath)
         
         print('Cleaned data saved to database!')
     
