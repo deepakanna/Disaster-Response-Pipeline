@@ -57,12 +57,12 @@ def build_model():
     return cv
 
 def evaluate_model(model, X_test, Y_test, category_names):
-    model.fit(X_train, y_train)
-    model.predict(X_test)
-    print(model.best_params_)
-    print(model.best_estimator_)
-    best = model.best_estimator_
-    y_pred = best.predict(X_test)
+    #model.fit(X_train, y_train)
+    #model.predict(X_test)
+    #print(model.best_params_)
+    #print(model.best_estimator_)
+    #best = model.best_estimator_
+    y_pred = model.predict(X_test)
     for i in range(36):
         print(y_test.columns[i], ':')
         print(classification_report(y_test.iloc[:, i], y_pred[:, i], target_names=Y.columns))
