@@ -31,4 +31,16 @@ This project requires Python 3 with pandas, numpy, sklearn, plotly, nltk, sqlalc
 
 3. Go to http://0.0.0.0:3001/
 
+## Result:
+The web app displays the Overview of the Training set and the distribution of the categories.
+![image](https://user-images.githubusercontent.com/110763030/198878677-99a5f9f0-4254-49cb-aaf3-97cb23e58169.png)
+![image](https://user-images.githubusercontent.com/110763030/198878714-ae078110-db2a-48ce-b504-769ab1b62ddf.png)
+
+The web app classifies the messages sent during disaster into 36 categories mentioned above.
+![image](https://user-images.githubusercontent.com/110763030/198879042-6bdcce35-b090-4ace-9eff-a9078f7e4d8f.png)
+![image](https://user-images.githubusercontent.com/110763030/198879080-a2ed12f4-c1e3-4d48-bf64-087f5fe6b2f4.png)
+
+
+## Acknowledgement:
+Thank you Udacity for the project and Figure Eight for the dataset.
 
