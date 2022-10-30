@@ -5,10 +5,10 @@ from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
     # load messages dataset
-    messages = pd.read_csv('messages.csv')
+    messages = pd.read_csv(messages_filepath)
     #messages.head()
     # load categories dataset
-    categories = pd.read_csv('categories.csv')
+    categories = pd.read_csv(categories_filepath)
     #categories.head()
     # merge datasets
     df = messages.merge(categories, how='inner', on=['id'])
@@ -46,13 +46,13 @@ def clean_data(df):
     # drop duplicates
     df = df.drop_duplicates()
     # check number of duplicates
-    df[df.duplicated()]
+    return df
 
 
 
 def save_data(df, database_filename):
-    engine = create_engine('sqlite:///disaster.db')
-    df.to_sql('disaster', engine, index=False)
+    engine = create_engine('sqlite:///'+database_filename)
+    df.to_sql('DisasterResponse', engine, index=False)
 
 
 
@@ -64,7 +64,7 @@ def main():
 
         print('Loading data...\n    MESSAGES: {}\n    CATEGORIES: {}'
               .format(messages_filepath, categories_filepath))
-        df = load_data(disaster_messages.csv, disaster_categories.csv)
+        df = load_data(messages_filepath, categories_filepath)
 
         print('Cleaning data...')
         df = clean_data(df)

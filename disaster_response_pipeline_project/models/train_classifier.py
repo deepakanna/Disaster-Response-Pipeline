@@ -1,24 +1,76 @@
 import sys
-
+import pandas as pd
+import numpy as np
+from nltk.tokenize import word_tokenize
+from nltk.tokenize import sent_tokenize
+from nltk.corpus import stopwords
+from nltk import pos_tag
+from nltk.stem.wordnet import WordNetLemmatizer
+from sklearn.pipeline import Pipeline
+from sqlalchemy import create_engine
+import re
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import confusion_matrix,accuracy_score
+import pickle
+import nltk
+nltk.download('punkt')
+import nltk
+nltk.download('stopwords')
+import nltk
+nltk.download('wordnet')
+from sklearn.model_selection import GridSearchCV
 
 def load_data(database_filepath):
-    pass
+    # load data from database
+    engine = create_engine('sqlite:///'+database_filepath)
+    df = pd.read_sql_table('DisasterResponse', engine)
+    Y = df.drop(['message', 'id', 'genre', 'original'], axis=1)
+    X = df['message']
+    category_names=Y.columns
+    return X,Y,category_names
 
 
 def tokenize(text):
-    pass
+    text = text.lower()
+    text = re.sub(r'[^a-zA-Z0-9]', " ", text)
+    tokens = word_tokenize(text)
+    words = [w for w in tokens if w not in stopwords.words('english')]
+    lemmatizer = WordNetLemmatizer()
+    clean_tokens = []
+    for w in words:
+        tok = lemmatizer.lemmatize(w).lower().strip()
+        clean_tokens.append(tok)
+    return clean_tokens
 
 
 def build_model():
-    pass
+    pipeline = Pipeline([('vect', CountVectorizer(tokenizer=tokenize)), ('tfidf', TfidfTransformer()),
+                         ('clf', MultiOutputClassifier(RandomForestClassifier()))])
+    parameters = {'clf__estimator__criterion': ['gini', 'entropy']}
 
+    cv = GridSearchCV(pipeline, param_grid=parameters)
+    return cv
 
 def evaluate_model(model, X_test, Y_test, category_names):
-    pass
+    model.fit(X_train, y_train)
+    model.predict(X_test)
+    print(model.best_params_)
+    print(model.best_estimator_)
+    best = model.best_estimator_
+    y_pred = best.predict(X_test)
+    for i in range(36):
+        print(y_test.columns[i], ':')
+        print(classification_report(y_test.iloc[:, i], y_pred[:, i], target_names=Y.columns))
 
 
 def save_model(model, model_filepath):
-    pass
+    with open(model_filepath,'wb')as f:
+        pickle.dump(model,f)
 
 
 def main():
